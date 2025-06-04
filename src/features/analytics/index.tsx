@@ -1,24 +1,22 @@
 import React, { useState } from "react";
 import { TextInput, Button, Group, Text, Loader } from "@mantine/core";
 import { useQuery } from "react-query";
-import { UrlInfoResponse } from "./types";
-import { fetchUrlInfo } from "./api";
+import { AnalyticsResponse } from "./types";
+import { fetchAnalytics } from "./api";
 
-const UrlInfo: React.FC = () => {
+const Analytics: React.FC = () => {
   const [shortUrl, setShortUrl] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
-  const { data, isLoading, isError, refetch } =
-    useQuery<UrlInfoResponse | null>(
-      ["urlInfo", shortUrl],
-      () => fetchUrlInfo(shortUrl),
-      {
-        enabled: false,
-        onError: () => {
-          setError("Something went wrong. Please try again.");
-        },
-      }
-    );
+  const { data, isLoading, isError, refetch } = useQuery<
+    AnalyticsResponse | null,
+    { message: string }
+  >(["analytics", shortUrl], () => fetchAnalytics(shortUrl), {
+    enabled: false,
+    onError: () => {
+      setError("Something went wrong. Please try again.");
+    },
+  });
 
   const handleSubmit = () => {
     if (shortUrl) {
@@ -32,7 +30,7 @@ const UrlInfo: React.FC = () => {
   return (
     <div>
       <TextInput
-        label="Enter Shortened URL"
+        label="Get analytics"
         value={shortUrl}
         onChange={(e) => setShortUrl(e.target.value)}
         placeholder="abcdef"
@@ -47,13 +45,21 @@ const UrlInfo: React.FC = () => {
       {isError && <Text color="red">{error}</Text>}
       {data && (
         <div>
-          <Text mt="md">Original URL: {data.originalUrl}</Text>
-          <Text>Created At: {new Date(data.createdAt).toLocaleString()}</Text>
-          <Text>Click Count: {data.clickCount}</Text>
+          <Text mt="md">URL click count: {data.totalClicks}</Text>
+          {data.lastIps.length > 0 && (
+            <>
+              <Text mt="md">Last IPs:</Text>
+              <ul>
+                {data.lastIps.map((ip, index) => (
+                  <li key={index}>{ip}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-export default UrlInfo;
+export default Analytics;

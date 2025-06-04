@@ -3,6 +3,7 @@ import ShortenUrlForm from "../features/shorten-url";
 import UrlInfo from "../features/url-info";
 import DeleteUrl from "../features/delete-url";
 import { QueryClient, QueryClientProvider } from "react-query";
+import Analytics from "../features/analytics";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,9 @@ function App() {
           <Space h="xl" />
 
           <UrlInfo />
+          <Space h="xl" />
+
+          <Analytics />
         </Container>
       </MantineProvider>
     </QueryClientProvider>
